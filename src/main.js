@@ -19,38 +19,34 @@ form.addEventListener('submit', handlerSubmit);
 function handlerSubmit(event) {
   event.preventDefault();
 
-  const inputValue = event.target.elements.search.value.trim(2, 0);
+  const inputValue = event.target.elements.search.value.trim();
 
   if (!inputValue) return;
 
   imageList.innerHTML = '';
-  const submitTime = Date.now();
 
   imageList.insertAdjacentHTML('afterbegin', loader());
 
   getPhoto(inputValue)
     .then(data => {
-      const waitingTime = Date.now() - submitTime;
-      setTimeout(() => {
-        if (!data.hits.length) {
-          imageList.innerHTML = '';
-          iziToast.show({
-            position: 'topRight',
-            color: 'red',
-            messageColor: 'black',
-            message:
-              'Sorry, there are no images matching your search query. Please try again!',
-          });
-        } else {
-          const markup = imageTemplates(data.hits);
-          imageList.innerHTML = markup;
-          const lightbox = new SimpleLightbox('.image-link', {
-            captionsData: 'alt',
-            captionDelay: 250,
-          });
-          lightbox.refresh();
-        }
-      }, waitingTime);
+      if (!data.hits.length) {
+        imageList.innerHTML = '';
+        iziToast.show({
+          position: 'topRight',
+          color: 'red',
+          messageColor: 'black',
+          message:
+            'Sorry, there are no images matching your search query. Please try again!',
+        });
+      } else {
+        const markup = imageTemplates(data.hits);
+        imageList.innerHTML = markup;
+        const lightbox = new SimpleLightbox('.image-link', {
+          captionsData: 'alt',
+          captionDelay: 250,
+        });
+        lightbox.refresh();
+      }
     })
     .catch(() => {
       imageList.insertAdjacentHTML('afterbegin', error());
